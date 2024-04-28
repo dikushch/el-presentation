@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>Event loop</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/black.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+
+	<link rel="stylesheet" href="dist/my.css">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+<!--####################### 1 -->
+			<section>
+				<h1>Event Loop</h1>
+				<aside class="notes">
+					Today we will speak about event loop and try to understand what is this
+				</aside>
+			</section>
+<!--####################### 2 -->
+			<section>
+				<section data-auto-animate>
+					<p>Javascript is Single Threaded</p>
+					<aside class="notes">
+						And first thing we will talk about that js is single threaded. What it means?
+					</aside>
+				</section>
+
+				<section data-auto-animate>
+					<p>Javascript is Single Threaded</p>
+					<pre>
+							<code data-line-numbers="1|2|3" data-trim>
+								console.log('1');
+								console.log('2');
+								console.log('3');
+							</code>
+						</pre>
+					<aside class="notes">
+						This means that the engine can execute no more than one line of code at a given time.
+						The second line will not be executed until the first line is executed.
+						We execute first line. Then second and third. And our code is done.
+					</aside>
+				</section>
+			</section>
+<!--####################### 3 -->
+			<section>
+				<section data-auto-animate>
+					<p>Call stack</p>
+					<aside class="notes">
+						So what happens when a function is called?
+						It goes into the call stack.
+						The place where the functions that the interpreter has reached and that need to be executed are stored.
+					</aside>
+				</section>
+
+				<section data-auto-animate>
+					<p>Call stack</p>
+					<div class="grid-s-c">
+						<div class="g-item code">
+							<span class="item-name">code</span>
+							<pre>
+								<code data-line-numbers data-trim>
+									console.log('1');
+									console.log('2');
+									console.log('3');
+								</code>
+							</pre>
+						</div>
+						<div class="g-item stack">
+							<span class="item-name">call stack</span>
+						</div>
+					</div>
+					
+					<aside class="notes">
+						lets look at this code again.
+					</aside>
+				</section>
+
+				<section data-auto-animate>
+					<p>Call stack</p>
+					<div class="grid-s-c">
+						<div class="g-item code">
+							<span class="item-name">code</span>
+							<pre>
+								<code data-line-numbers="1" data-trim>
+									console.log('1');
+									console.log('2');
+									console.log('3');
+								</code>
+							</pre>
+						</div>
+						<div class="g-item stack">
+							<span class="item-name">call stack</span>
+							<span class="fragment fade-in-then-out stack-item">console.log('1')</span>
+						</div>
+					</div>
+					
+					<aside class="notes">
+						When we call the first console.log it goes on the stack.
+						Then it is executed and removed from the stack and we move to the second line of code.
+					</aside>
+				</section>
+
+				<section data-auto-animate>
+					<p>Call stack</p>
+					<div class="grid-s-c">
+						<div class="g-item code">
+							<span class="item-name">code</span>
+							<pre>
+								<code data-line-numbers="2" data-trim>
+									console.log('1');
+									console.log('2');
+									console.log('3');
+								</code>
+							</pre>
+						</div>
+						<div class="g-item stack">
+							<span class="item-name">call stack</span>
+							<span class="fragment fade-in-then-out stack-item">console.log('2')</span>
+						</div>
+					</div>
+					
+					<aside class="notes">
+						Call console.log, it gets on the stack, executed and removed from the stack and we move to the third line of code.
+					</aside>
+				</section>
+
+				<section data-auto-animate>
+					<p>Call stack</p>
+					<div class="grid-s-c">
+						<div class="g-item code">
+							<span class="item-name">code</span>
+							<pre>
+								<code data-line-numbers="3" data-trim>
+									console.log('1');
+									console.log('2');
+									console.log('3');
+								</code>
+							</pre>
+						</div>
+						<div class="g-item stack">
+							<span class="item-name">call stack</span>
+							<span class="fragment fade-in-then-out stack-item">console.log('3')</span>
+						</div>
+					</div>
+					
+					<aside class="notes">
+						Call console.log, it gets on the stack, executed and removed from the stack and our code is done.
+					</aside>
+				</section>
+			</section>
+<!--####################### 4 -->
+				<section>
+					<section data-auto-animate>
+						<p>Call stack</p>
+						<div class="grid-s-c">
+							<div class="g-item code">
+								<span class="item-name">code</span>
+								<pre>
+									<code data-line-numbers data-trim>
+										functio one() {
+											console.log('1');
+										}
+
+										function twoAfterOne() {
+											one();
+											console.log('2');
+										}
+
+										twoAfterOne();
+									</code>
+								</pre>
+							</div>
+							<div class="g-item stack">
+								<span class="item-name">call stack</span>
+							</div>
+						</div>
+						
+						<aside class="notes">
+							let's look at another example.
+						</aside>
+					</section>
+	
+					<section data-auto-animate>
+						<p>Call stack</p>
+						<div class="grid-s-c">
+							<div class="g-item code">
+								<span class="item-name">code</span>
+								<pre>
+									<code data-line-numbers="10" data-trim>
+										functio one() {
+											console.log('1');
+										}
+
+										function twoAfterOne() {
+											one();
+											console.log('2');
+										}
+
+										twoAfterOne();
+									</code>
+								</pre>
+							</div>
+							<div class="g-item stack">
+								<span class="item-name">call stack</span>
+								<span class="fragment stack-item">twoAfterOne();</span>
+							</div>
+						</div>
+						
+						<aside class="notes">
+							Call twoAfterOne function. It goes into stack. 
+						</aside>
+					</section>
+	
+					<section data-auto-animate>
+						<p>Call stack</p>
+						<div class="grid-s-c">
+							<div class="g-item code">
+								<span class="item-name">code</span>
+								<pre>
+									<code data-line-numbers="5-8|6" data-trim>
+										functio one() {
+											console.log('1');
+										}
+
+										function twoAfterOne() {
+											one();
+											console.log('2');
+										}
+
+										twoAfterOne();
+									</code>
+								</pre>
+							</div>
+							<div class="g-item stack">
+								<span class="item-name">call stack</span>
+								<span class="fragment stack-item">one();</span>
+								<span class="stack-item">twoAfterOne();</span>
+							</div>
+						</div>
+						
+						<aside class="notes">
+							Then this function call function one and it goes into stack.
+						</aside>
+					</section>
+	
+					<section data-auto-animate>
+						<p>Call stack</p>
+						<div class="grid-s-c">
+							<div class="g-item code">
+								<span class="item-name">code</span>
+								<pre>
+									<code data-line-numbers="1-3|2" data-trim>
+										functio one() {
+											console.log('1');
+										}
+
+										function twoAfterOne() {
+											one();
+											console.log('2');
+										}
+
+										twoAfterOne();
+									</code>
+								</pre>
+							</div>
+							<div class="g-item stack">
+								<span class="item-name">call stack</span>
+								<span class="fragment fade-in-then-out stack-item">console.log('1');</span>
+								<span class="fragment fade-out stack-item">one();</span>
+								<span class="stack-item">twoAfterOne();</span>
+							</div>
+						</div>
+						
+						<aside class="notes">
+							One calls console.log. It goes into stack. Then executes and ine executes too.
+						</aside>
+					</section>
+
+					<section data-auto-animate>
+						<p>Call stack</p>
+						<div class="grid-s-c">
+							<div class="g-item code">
+								<span class="item-name">code</span>
+								<pre>
+									<code data-line-numbers="7|1-10" data-trim>
+										functio one() {
+											console.log('1');
+										}
+
+										function twoAfterOne() {
+											one();
+											console.log('2');
+										}
+
+										twoAfterOne();
+									</code>
+								</pre>
+							</div>
+							<div class="g-item stack">
+								<span class="item-name">call stack</span>
+								<span class="fragment fade-in-then-out stack-item">console.log('2');</span>
+								<span class="fragment fade-out stack-item">twoAfterOne();</span>
+							</div>
+						</div>
+						
+						<aside class="notes">
+							And we go to the next line inside the twoAfterOne function and call console.log. It goes into stack, executed and removed. Our function is done and code is done.
+							Nothing out of the ordinary. The order in which the functions arrive is the order in which they are executed
+						</aside>
+					</section>
+				</section>
+<!--####################### 5 -->
+<section>
+	<section data-auto-animate>
+		<div class="grid-s-c-c">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+			</div>
+		</div>
+		
+		<aside class="notes">
+			But what will happen if we add setTimeout. Lets look.
+		</aside>
+	</section>
+
+	<section data-auto-animate>
+		<div class="grid-s-c-c">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers="1" data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+				<span class="fragment fade-in-then-out stack-item">console.log('1');</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+				<span class="fragment console-item">1</span>
+			</div>
+		</div>
+		
+		<aside class="notes">
+			At first, it's the same as before. Call console.log, it is added to the stack, executed and deleted.
+		</aside>
+	</section>
+
+	<section data-auto-animate>
+		<div class="grid-s-c-c">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers="3-5" data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+				<span class="fragment fade-in-then-out stack-item">setTimeout();</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+				<span class="console-item">1</span>
+			</div>
+		</div>
+		
+		<aside class="notes">
+			Now call setTimout, it is placed on the stack, executed and deleted.
+		</aside>
+	</section>
+
+	<section data-auto-animate>
+		<div class="grid-s-c-c">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers="7" data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+				<span class="fragment fade-in-then-out stack-item">console.log('3');</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+				<span class="console-item">1</span>
+				<span class="fragment console-item">3</span>
+			</div>
+		</div>
+		
+		<aside class="notes">
+			Going next line. Call console.log, it goes into stack, executed and deleted and in console we see 3
+		</aside>
+	</section>
+
+	<section data-auto-animate>
+		<div class="grid-s-c-c">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+				<span class="fragment fade-in-then-out stack-item">console.log('2');</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+				<span class="console-item">1</span>
+				<span class="console-item">3</span>
+				<span class="fragment console-item">2</span>
+			</div>
+		</div>
+		
+		<aside class="notes">
+			Looks like  our code is done. But after 2 seconds in call stack we see console.log('2'). Its executed and removed.In console we see 2 and now our code done.
+			But now there are questions. Where console.log('2') came from.
+		</aside>
+	</section>
+
+</section>
+<!--####################### 6 -->
+<section>
+	<section data-auto-animate>
+		<div class="grid-container">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+			</div>
+			<div class="g-item api">
+				<span class="item-name">web api</span>
+			</div>
+			<div class="g-item macro">
+				<span class="item-name">macrotask queue</span>
+			</div>
+			<div class="g-item loop">
+			</div>
+		</div>
+		
+		<aside class="notes">
+			And now we need to familiarize ourselves with the event loop.
+			Let's first say that setTimeout is not part of the js engine.
+			This is an additional functionality - Web API that takes care of timers, intervals, event handlers.
+			And the control of how Web API functions should be called is taken care of by the event loop.
+			Lets look at our code again.
+		</aside>
+	</section>
+
+	<section data-auto-animate>
+		<div class="grid-container">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers="1" data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+				<span class="fragment fade-in-then-out stack-item">console.log('1');</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+				<span class="fragment console-item">1</span>
+			</div>
+			<div class="g-item api">
+				<span class="item-name">web api</span>
+			</div>
+			<div class="g-item macro">
+				<span class="item-name">macrotask queue</span>
+			</div>
+			<div class="g-item loop">
+			</div>
+		</div>
+		
+		<aside class="notes">
+			Call console.log(), it goes into stack, executed and remove.
+		</aside>
+	</section>
+
+	<section data-auto-animate>
+		<div class="grid-container">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers="3-5" data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+				<span class="fragment fade-in-then-out stack-item">setTimeout();</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+				<span class="console-item">1</span>
+			</div>
+			<div class="g-item api">
+				<span class="item-name">web api</span>
+				<span class="fragment api-item">setTimeout(cb(), 2000);</span>
+			</div>
+			<div class="g-item macro">
+				<span class="item-name">macrotask queue</span>
+			</div>
+			<div class="g-item loop">
+			</div>
+		</div>
+		
+		<aside class="notes">
+			Call setTimeout. It goes into stack and then it goes into Web Api. At the same time, our code will continue to execute.
+		</aside>
+	</section>
+
+	<section data-auto-animate>
+		<div class="grid-container">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers="7" data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+				<span class="fragment fade-in-then-out stack-item">console.log('3')</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+				<span class="console-item">1</span>
+				<span class="fragment console-item">3</span>
+			</div>
+			<div class="g-item api">
+				<span class="item-name">web api</span>
+				<span class="fragment fade-out api-item">setTimeout(cb(), 2000);</span>
+			</div>
+			<div class="g-item macro">
+				<span class="item-name">macrotask queue</span>
+				<span class="fragment fade-in-then-out macro-item">cb()</span>
+			</div>
+			<div class="g-item loop">
+			</div>
+		</div>
+		
+		<aside class="notes">
+			Call console.log(), it goes into stack, executed and remove. And our stack is empty.
+			setTimeout is still in the Web API. It will wait 2 seconds there.After 2 seconds, callback function inside setTimeout goes into queue.
+			When stack is empty, event loop checks queue. If something in queue, it will be moved to the stack.
+		</aside>
+	</section>
+
+	<section data-auto-animate>
+		<div class="grid-container">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers="3-5" data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+				<span class="fragment stack-item">cb();</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+				<span class="console-item">1</span>
+				<span class="console-item">3</span>
+			</div>
+			<div class="g-item api">
+				<span class="item-name">web api</span>
+			</div>
+			<div class="g-item macro">
+				<span class="item-name">macrotask queue</span>
+			</div>
+			<div class="g-item loop">
+			</div>
+		</div>
+		
+		<aside class="notes">
+			In our case, this is the callback from setTimeout.
+		</aside>
+	</section>
+
+	<section data-auto-animate>
+		<div class="grid-container">
+			<div class="g-item code">
+				<span class="item-name">code</span>
+				<pre>
+					<code data-line-numbers="4" data-trim>
+						console.log('1');
+
+						setTimeout(() => {
+							console.log('2');
+						}, 2000);
+
+						console.log('3');
+					</code>
+				</pre>
+			</div>
+			<div class="g-item stack">
+				<span class="item-name">call stack</span>
+				<span class="fragment fade-in-then-out stack-item">console.log('2');</span>
+				<span class="fragment fade-out stack-item">cb();</span>
+			</div>
+			<div class="g-item console">
+				<span class="item-name">console</span>
+				<span class="console-item">1</span>
+				<span class="console-item">3</span>
+				<span class="fragment console-item">2</span>
+			</div>
+			<div class="g-item api">
+				<span class="item-name">web api</span>
+			</div>
+			<div class="g-item macro">
+				<span class="item-name">macrotask queue</span>
+			</div>
+			<div class="g-item loop">
+			</div>
+		</div>
+		
+		<aside class="notes">
+			It goes into stack, then call console.log('2'), executed, removed and our code is done.
+			So this is how event loop works.
+		</aside>
+	</section>
+
+</section>
+<!--####################### 7 -->
+<section>
+	<p>Event loop</p>
+	<div class="grid-container-s">
+		<div class="g-item stack">
+			<span class="item-name">call stack</span>
+		</div>
+		<div class="g-item api">
+			<span class="item-name">web api</span>
+		</div>
+		<div class="g-item macro">
+			<span class="item-name">macrotask queue</span>
+		</div>
+		<div class="g-item micro">
+			<span class="item-name">microtask queue</span>
+		</div>
+		<div class="g-item loop">
+		</div>
+	</div>
+	
+	<aside class="notes">
+		Let's take a look at the event loop layout. That's where another line came in. There are two queues. The macro queue contains callbacks from timers, I/O events, and user interface events.
+		Microtask queue contains callbacks from promises and mutation observers API. The event loop always gives higher priority to the microtask queue, and will process all the callbacks in the microtask queue before moving on to the macrotask queue.
+	</aside>
+</section>
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+</body>
+
+</html>

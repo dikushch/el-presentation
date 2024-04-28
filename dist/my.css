@@ -1,0 +1,133 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 20px;
+  grid-template-areas:
+    "code code stack stack api api"
+    "code code stack stack api api"
+    "console console loop macro macro macro"
+    "console console loop micro micro micro";
+}
+
+.grid-container-s {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 70px);
+  gap: 20px;
+  grid-template-areas:
+    "stack stack api api"
+    "stack stack api api"
+    "loop macro macro macro"
+    "loop micro micro micro";
+}
+
+.grid-container .code {
+  font-size: 30px;
+}
+
+.grid-s-c {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-areas: "code stack";
+}
+
+.grid-s-c-c {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr min-content;
+  grid-template-areas: 
+    "code stack"
+    "console console";
+}
+
+.g-item {
+  position: relative;
+  padding: 15px 10px 10px 10px;
+  border: 1px solid aquamarine;
+}
+
+.item-name {
+  font-size: 20px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  padding: 0 20px;
+  background-color: darkslategrey;
+  color: white;
+  text-align: center;
+  text-wrap: nowrap;
+}
+
+.code {
+  grid-area: code;
+  border-color: darkgoldenrod;
+}
+
+.console {
+  grid-area: console;
+  border-color: darkgoldenrod;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.loop {
+  grid-area: loop;
+  background-image: url("loop.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.macro {
+  grid-area: macro;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.micro {
+  grid-area: micro;
+}
+
+.api {
+  grid-area: api;
+}
+
+.stack {
+  grid-area: stack;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.stack-item,
+.console-item,
+.api-item {
+  text-align: center;
+  background-color: darkolivegreen;
+  width: 100%;
+  font-size: 20px;
+}
+
+.console-item,
+.api-item {
+  box-sizing: border-box;
+  text-align: left;
+  padding: 0 20px;
+}
+
+.macro-item {
+  font-size: 20px;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: darkolivegreen;
+}
